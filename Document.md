@@ -24,21 +24,21 @@ header-includes: |
 ---
 
 
-## Part 0: Các vấn đề hiện nay [^fn1]
+## Phần 0: Các vấn đề hiện nay [^fn1]
 Các mô hình học máy là những mô hình hộp đen. Chúng ta không thể xác thực, kiểm tra, kiểm chứng tính đúng đắn của các kết quả mà các mô hình học máy hộp đen này trả lời. 
 
-**"Explanining more than classifiers"**: với sự phát triển ngày nay, bên cạnh các bài toán phân loại, nhu cầu về các mô hình phân cụm (clustering) trong học máy ngày càng lớn. Các mô hình phân cụm hiện nay đều gặp các vấn đề về phát hiện outlier. Do đó cần phải phát triển các các phương pháp để có thể giải thích được những vấn đề đó.
+**"Explaining more than classifiers"**: với sự phát triển ngày nay, bên cạnh các bài toán phân loại, nhu cầu về các mô hình phân cụm (clustering) trong học máy ngày càng lớn. Các mô hình phân cụm hiện nay đều gặp các vấn đề về phát hiện outlier nhưng con người không thể phân tích được những tính toán bên trong mô hình. Do đó cần phải phát triển các các phương pháp để có thể giải thích được những vấn đề đó.
 
 Con người cần khả năng giải thích, diễn giải của các mô hình hộp đen để:
 - Xác thực độ tin cậy của mô hình
-- Đảm bảo khía cạnh hợp pháp (đặc biệt là việc áp dụng các mô hình vào các lĩnh vực pháp lý hoặc các lĩnh vực có rủi ro cao)
+- Đảm bảo khía cạnh pháp lý (đặc biệt là việc áp dụng các mô hình vào các lĩnh vực pháp lý hoặc các lĩnh vực có rủi ro cao)
 - Học hỏi từ các hệ thống, mô hình
 - Cải tiến các hệ thống, mô hình.
 
 Đưa ra lời giải thích cho các mô hình hộp đen đồng nghĩa với việc con người có thể trả lời được câu hỏi **"Tại sao mô hình lại cho ra được kết quả như thế này?"**
 
 
-## Part 1: Một số phương pháp giải thích (explanation method)
+## Phần 1: Một số phương pháp giải thích (explanation method)
 
 1. Perturbation-Based:
 
@@ -88,7 +88,7 @@ Con người cần khả năng giải thích, diễn giải của các mô hình
 
 Tiến hành xóa hoặc che một phần của ảnh gốc ban đầu, khi đó sẽ có 2 trường hợp xảy ra:
 
-- TH1: mô hình vẫn nhận diện và phân lớp chính xác lâu đài &rarr; Xác định được các thành phần không quan trọng trong việc phân lớp (vì khi che những phân đấy đi, kết quả phân lớp vẫn chính xác).
+- TH1: mô hình vẫn nhận diện và phân lớp chính xác lâu đài &rarr; Xác định được các thành phần không quan trọng trong việc phân lớp (vì khi che những phần đấy đi, kết quả phân lớp vẫn chính xác).
 
 - TH2: mô hình không phân lớp chính xác &rarr; xác định được thông tin phần vừa che rất quan trọng (ảnh hưởng đến kết quả phân lớp)
 
@@ -132,11 +132,13 @@ Tiến hành xóa hoặc che một phần của ảnh gốc ban đầu, khi đó
 
 **Ý tưởng:** sử dụng chính kiến trúc để làm đơn giản hóa việc giải thích. Thay vì giải thích toàn bộ cùng lúc, chia nhỏ mạng nơ-ron thành từng phần nhỏ dễ giải thích hơn. Các bước: phân rã mô hình thành các decision function &rarr; giải thích các function &rarr; tổng hợp các lời giải thích.
 
+![](https://i.imgur.com/Jz8WH5q.png)
+
 Quy trình lan truyền của LRP phải đảm bảo tính bảo toàn, nghĩa là những gì nơ-ron nhận được phải phân phối lại cho lớp dưới với lượng như nhau, tương tự như định luật bảo toàn của Kirchoff trong các mạch điện. Với $j$ và $k$ là những nơ-ron thuộc hai tầng liên tiếp của mô hình, khi đó việc truyền điểm liên quan (relevance scores) $(R_k)_k$ của một tầng nhất định lên những nơ-ron của tầng thấp hơn đạt được bằng cách áp dụng quy tắc:
 $$
 R_j = \sum\limits_k{\frac{z_{jk}}{\sum_j{z_{jk}}}R_k}
 $$
-Trong đó, đại lượng $w_{jk}$ mô hình hóa mức độ mà nơ-ron $j$ đã đóng góp để làm cho nơ-ron $k$ có liên quan, mẫu số là tổng $z_{jk}$ nhằm bảo toàn thông tin. Quá trình lan truyền kết thúc tại các đặc trưng đầu vào. Nếu sử dụng quy tắc trên cho tất cả nơ-ron trong mạng ta có thể dễ dàng xác minh thuộc tính bảo toàn theo lớp $\sum_j{R_j}=\sum_k{R_k}$, và mở rộng tính bảo toàn lên toàn cục $\sum_i{R_i}=f(x)$.
+Trong đó, đại lượng $z_{jk}$ mô hình hóa mức độ mà nơ-ron $j$ đã đóng góp để làm cho nơ-ron $k$ có liên quan, mẫu số là tổng $z_{jk}$ nhằm bảo toàn thông tin. Quá trình lan truyền kết thúc tại các đặc trưng đầu vào. Nếu sử dụng quy tắc trên cho tất cả nơ-ron trong mạng ta có thể dễ dàng xác minh thuộc tính bảo toàn theo lớp $\sum_j{R_j}=\sum_k{R_k}$, và mở rộng tính bảo toàn lên toàn cục $\sum_i{R_i}=f(x)$.
 $$
 \sum_{i}{R_i}=...=\sum_i{R_i^{(l)}}=\sum_j{R_j}^{{(l+1)}}=...=f(x)
 $$
@@ -210,24 +212,21 @@ Phần hệ số của đạo hàm bậc nhất sẽ quyết định lượng $R
 
 1. Relevance model  
     Để có được một biểu thức dạng đóng cho các số hạng của phương trình trên, người ta cần thay thế hàm liên quan thực sự $R_k(a)$ bằng một mô hình phù hợp $\hat{R}_k(a)$ dễ phân tích hơn. Một trong những mô hình như vậy là *modulated ReLU activation*:
-    
 $$
 \hat{R}_k(a)=max(0,\sum_j{a_jw_{jk}})c_k
 $$
-Module $c_k$ là hằng số và được đặt sao cho $\hat{R}_k(a)=R_k(a)$ tại điểm dữ liệu hiện tại. Có thể xem $c_k$ là hằng số khi $R_k$ là kết quả của việc áp dụng $LRP-0/\epsilon/\gamma$ ở các tầng cao hơn.
+    Module $c_k$ là hằng số và được đặt sao cho $\hat{R}_k(a)=R_k(a)$ tại điểm dữ liệu hiện tại. Có thể xem $c_k$ là hằng số khi $R_k$ là kết quả của việc áp dụng $LRP-0/\epsilon/\gamma$ ở các tầng cao hơn.
 
-2. Khai triển Taylor
-
+2. Khai triển Taylor  
 $$
 \hat{R}_k(a)=\hat{R}_k(\tilde{a})+\sum_j\underbrace{(a_j-\tilde{a}_j)\cdot w_{jk}c_k}_{R_{j\leftarrow k}}+0
 $$
-Hệ số tại đạo hàm bậc hai hoặc cao hơn bằng 0 do tính tuyến tính trong miền kích hoạt của hàm ReLU. Hệ số tại đạo hàm bậc không có thể làm nhỏ tùy ý bằng cách chọn điểm tham chiếu gần bản lề ReLU. Khi một điểm tham chiếu được chọn, khai triển đến bặc nhất có thể tính toán một cách dễ dàng.
+    Hệ số tại đạo hàm bậc hai hoặc cao hơn bằng 0 do tính tuyến tính trong miền kích hoạt của hàm ReLU. Hệ số tại đạo hàm bậc không có thể làm nhỏ tùy ý bằng cách chọn điểm tham chiếu gần bản lề ReLU. Khi một điểm tham chiếu được chọn, khai triển đến bậc nhất có thể tính toán một cách dễ dàng.
 
-![](https://i.imgur.com/5TJ82pB.png)
+![](https://i.imgur.com/5TJ82pB.png)  
+*Minh họa DTD: (a) mô hình liên quan dưới góc nhìn đồ thị, (b) mô hình liên quan và điểm tham chiếu khi thực hiện khai triển Taylor dưới góc nhìn hàm số, \(c\) lan truyền khai triển đến đạo hàm bậc nhất về các tầng thấp hơn.
 
-*Minh họa DTD: (a) mô hình liên quan dưới góc nhìn đồ thị, (b) mô hình liên quan và điểm tham chiếu khi thực hiện khai triển Taylor dưới góc nhìn hàm số, (c) lan truyền khai triển đến đạo hàm bậc nhất về các tầng thấp hơn.
-
-3. Choosing reference point
+3. Lựa chọn điểm tham chiếu
 
 $$
 \tilde{a}^{(k)}=0\Leftrightarrow \rho=(\cdot),\epsilon=0 \text{(LRP-0)}
@@ -262,7 +261,7 @@ Các kí hiệu $(\cdot)^+=max(0,\cdot)$ và $(\cdot)^-=min(0,\cdot)$. Với $LR
 
 *Giải thích mô hình dự đoán tòa lâu đài với các luật khác nhau ở các tầng ($\gamma=0.25$ và $\epsilon=0.25$). Nguồn: G. Montavon et al.[^fn2]*
 
-## Part 2: Đánh giá các lời giải thích (Evaluating Explanations)
+## Phần 2: Đánh giá các lời giải thích (Evaluating Explanations)
 
 **Desiderata for Explanations**
 
@@ -325,8 +324,8 @@ Tuy nhiên phương pháp đánh giá này khó có thể áp dụng được đ
 
 
 
-## Part 3: XAI applications
-**LRP applied to different problems:**
+## Phần 3: Ứng dụng của XAI (XAI applications)
+**Ứng dụng của LRP trong những vấn đề khác nhau:**
 
 Có thể áp dụng trong nhiều lĩnh vực để giải quyết các vấn đề khác nhau. Không những có thể áp dụng cho hình ảnh, mà còn áp dụng cho âm thanh, văn bản, video hoặc dữ liệu trong lĩnh vực y tế, lĩnh vực khoa học, lĩnh vực công nghiệp,...
 
@@ -334,23 +333,29 @@ Có thể áp dụng trong nhiều lĩnh vực để giải quyết các vấn �
 
 Mô hình dự đoán đúng nhưng các đặc trưng mà mô hình học được lại không hợp lí. VD: với bức ảnh con tàu thì mô hình tập trung vào vùng có nước, với bức ảnh đoàn tàu thì mô hình tập trung vào đường ray, với ảnh con ngựa thì mô hình tập trung vào phần copyright text (vì có nhiều ảnh con ngựa khác cũng có chung copyright text). Từ đây ta thấy XAI giúp các nhà nghiên cứu hiểu về cách học của mạng nơ-ron trong tác vụ phân loại ảnh nhằm sửa lỗi/cải tiến mô hình.
 
-**2. Validating a Face Classifier:**
+![](https://i.imgur.com/rFxJkgI.png)
+*Nguồn: Lapuschkin et al. 2019[^fn4]*
+
+**2. Kiểm chứng mô hình phân loại ảnh mặt người:**
 
 Mô hình dự đoán giới tính và độ tuổi của người trong ảnh (độ tuổi sẽ bao gồm các khoảng từ (0-2),(4-6),(8-13),(15-20),(25-32),(38-43),(48-53),(60+)). Bằng cách trực quan hóa người trong ảnh thành biểu đồ nhiệt (heatmap), mô hình giúp chúng ta dễ dàng xác định được các yếu tố ảnh hưởng đến kết quả dự đoán. Bao gồm xác định các chi tiết, yếu tố trên khuôn mặt người khiến cho mô hình có dự đoán như thế, nghĩa là ta có thể giải thích được vì sao mô hình lại dự đoán kết quả giới tính và độ tuổi như thế.
 
-**3.Understanding Learning Behaviour**:
+![](https://i.imgur.com/BYrauEN.png)
+
+
+**3. Hiểu về hành vi học**:
 
 Qua ví dụ trò chơi Atari Breakout
 
 ![](https://i.imgur.com/P9MhyJn.png)
 
-*Giao diện và cách thức chơi của trò Atari Breakout. Nguồn: Lapuschkin et al. 2019*
+*Giao diện và cách thức chơi của trò Atari Breakout. Nguồn: Lapuschkin et al. 2019[^fn4]*
 
 ![](https://i.imgur.com/7rJv6qi.png)
 
-*Biểu đồ phân bố sự tương quan trong suốt quả trình huấn luyện mô hình. Nguồn: Lapuschkin et al. 2019*
+*Biểu đồ phân bố sự tương quan trong suốt quá trình huấn luyện mô hình. Nguồn: Lapuschkin et al. 2019[^fn4]*
 
-Quan sát biểu độ trực quan mô hình được huấn luyện qua từng epoch. 
+Quan sát biểu đồ trực quan mô hình được huấn luyện qua từng epoch. 
 
 - Đường màu xanh thể hiện quá bóng, là một yếu tố quan trọng trong trò chơi vì nếu để mất bóng (quả bóng rơi xuống dưới) thì trò chơi sẽ kết thúc. 
 
@@ -360,9 +365,9 @@ Quan sát biểu độ trực quan mô hình được huấn luyện qua từng 
 
 Từ đó ta có thể hiểu được hành vi học của mô hình. Đầu tiên là quan sát chuyển động của quả bóng, sau đó tập trung vào bàn đạp và cuối cùng là tập trung vào đường hầm để giúp ăn được nhiều điểm nhất đồng thời rủi ro thua thấp nhất.
 
-4. **XAI in sciences**
+**4. XAI trong các ngành khoa học khác**:
 
-    XAI được sử dụng như một công cụ để phân tích các dự đoán, chiến lược (hành vi) học của mô hình, đồng thời được sử dụng để phân tích dữ liệu. Ví dụ trong phân tích ảnh y tế, Thomas et al. đã sử dụng cách tiếp cận CNN+LSTM để phân tích các ảnh đầu vào, sau đó sử dụng LRP để trực quan hóa các kết quả.
+XAI được sử dụng như một công cụ để phân tích các dự đoán, chiến lược (hành vi) học của mô hình, đồng thời được sử dụng để phân tích dữ liệu. Ví dụ trong phân tích ảnh y tế, Thomas et al. đã sử dụng cách tiếp cận CNN+LSTM để phân tích các ảnh đầu vào, sau đó sử dụng LRP để trực quan hóa các kết quả.
 
 **Kết luận**:
 
@@ -374,9 +379,9 @@ Từ đó ta có thể hiểu được hành vi học của mô hình. Đầu ti
 
 - Một số tình huống con người không hiểu được các lời giải thích: các lĩnh vực không thể diễn giải được (chuỗi thời gian, trình tự, ngữ cảnh) hay "Pixel-wise" thay vì sử dụng các khái niệm của con người.
 
-## Part 4: Dataset-wide XAI 
+## Phần 4: XAI trong các tập dữ liệu (Dataset-wide XAI) 
 
-Thông thường trong nghiên cứu, ta sẽ tìm lời giải thích đối với từng hình ản riêng lẻ, nhưng trên thực tế tập dữ liệu rất lớn (ví dụ như hàng triệu tấm ảnh). Việc này gây ra khó khăn rất lớn vì chúng ta không thể nào tìm lời giải thích cho hàng ngàn, hàng triệu dữ liệu trong tập data-wide. 
+Thông thường trong nghiên cứu, ta sẽ tìm lời giải thích đối với từng hình ảnh riêng lẻ, nhưng trên thực tế tập dữ liệu rất lớn (ví dụ như hàng triệu tấm ảnh). Việc này gây ra khó khăn rất lớn vì chúng ta không thể nào tìm lời giải thích cho hàng ngàn, hàng triệu dữ liệu trong tập data-wide. 
 
 &rarr; Giải pháp cho vấn đề trên là thực hiện gom nhóm (clustering). Tìm các lời giải thích cho mô hình hộp đen, sau đó thực hiện tính toán để xem xét liệu có tồn tại các cấu trúc chung nào hay không để gom nhóm các lời giải thích lại với nhau. 
 
@@ -386,8 +391,18 @@ Trong bài báo [^fn4], nhóm tác giả đã sử dụng LRP chỉ ra những v
 
 - Đầu tiên là mô hình dựa trên Fisher vectors được huấn luyện trên tập dữ liệu PASCAL VOC 2007. Mô hình này cùng với đối thủ của nó (một mạng nơ-ron học sâu được huấn luyện trước) được fine-tune trên PASCAL VOC đều cho ra kết quả ở mức SOTA. Tuy nhiên, khi áp dụng LRP để tạo ra bản đồ nhiệt, nhóm tác giả nhận thấy rằng những đặc trưng mà mô hình học được là không đúng. Với những bức ảnh con ngựa, đáng lẽ mô hình sẽ tập trung vào vận động viên cưỡi ngựa và con ngựa nhưng bản đồ nhiệt lại cho thấy các pixel ở góc phải dưới mới quan trọng. Đây là vị trí ghi nguồn của bức ảnh. Khi kiểm tra các bức ảnh thì các bức ảnh con ngựa đều có chung đặc điểm này, do đó, các mô hình bị overfitting mặc dù đặc trưng mà chúng học được là không chính xác.
 
+![](https://i.imgur.com/CqGyZ1m.png)
+*Nguồn: Lapuschkin et al. 2019[^fn4]*
+
 - Atari Pinball: mô hình học đã tập trung vào những khu vực chứa pixel là đối tượng ghi điểm và bỏ qua hai thanh chèo. Đầu tiên, mô hình sẽ đưa quả bóng vào Atari rollover mà không sử dụng thanh chèo, sau đó tìm cách "huých" vào bàn pinball sao cho quả bóng qua lại vĩnh viễn Left rollover (đây là khu vực ghi nhiều điểm nhất) mà không làm nghiêng bàn bi lắc. Mô hình học đã học được cách lạm dụng ngưỡng "nhúc nhích" được thực hiện thông qua cơ chế nghiêng trong Atari Pinball. Ở góc độ trò chơi, việc khai thác cơ chế trò chơi có thể xem là hợp lí, tuy nhiên trong thực tế, các phần mềm trò chơi sẽ được lập trình để thoát khỏi vòng lặp như thế.
+
+![](https://i.imgur.com/Ry79rxO.png)
+*Nguồn: Lapuschkin et al. 2019[^fn4]*
+
 - Atari Breakout: Giai đoạn đầu, mô hình học cách kiểm soát quả bóng, do đó phần thanh đỡ sẽ sáng nhất, giai đoạn sau mô hình sẽ tìm cách đưa quả bóng vào khu vực có dạng phễu. Đây cũng là chiến lược mà con người sử dụng trong trò chơi này.
+
+![](https://i.imgur.com/LGO732v.png)
+*Nguồn: Lapuschkin et al. 2019[^fn4]*
 
 **Spectral Relevance Analysis - SpRAy**
 (tạm dịch: phân tích tương quan phổ)
@@ -474,7 +489,7 @@ $Z = visualization\_embedding(\Phi)$
 
 *Ba bước loại bỏ Hans. Nguồn: Anders et al.[^fn6]*
 
-## Part 5: Explanation-Guided Training
+## Phần 5: Explanation-Guided Training
 
 Mục tiêu: hướng dẫn mô hình dựa trên bằng chứng được học từ hình ảnh khi dự đoán những từ phổ biến.
 
@@ -499,7 +514,7 @@ với $R$ là phần thưởng, $S^s$ là câu được chọn từ phân phối
 Ví dụ với mô hình Ada-LSTM, LRP tuân theo cấu trúc gốc của mô hình và di chuyển cùng hướng với lan truyền ngược của gradient (ngoại trừ cơ chế attention) dọc theo các cạnh của đồ thị có hướng không tuần hoàn. Điểm khác biệt là thay thế đạo hàm từng phần trên cạnh bằng các luật tái phân phối LRP dựa trên deep Taylor framework. 
 Đầu tiên khởi tạo một relevance score cho từ mục tiêu, $R(w_T)$, từ kết quả của tầng fully-connected. Các luật LRP được tính toán trên tất cả các tầng $\text{fc}, \oplus, \text{Language LSTM}, ATT_{ada}, \text{Decoder LSTM, và Encoder}$. Với mỗi từ được giải thích, LRP gán một giá trị relevance score cho tất cả pixel của ảnh đầu vào $(R(image))$ và mỗi từ trong chuỗi đầu vào $(R(w_{T-1}),...,R(w_1))$. Ta có thể trực quan hóa lời giải thích bằng heatmap khi tính trung bình $R(image)$ qua chiều các channel. Relevance score của một từ là tổng relevance score của các từ trước trên word embedding.
 
-## Part 6: Explaning Non-Neural Models [^fn8]
+## Phần 6: Giải thích các mô hình phi nơ-ron (Explaining Non-Neural Models) [^fn8]
 Về nguyên tắc, chúng ta có thể sử dụng các kỹ thuật trong XAI để có thể đưa ra lời giải thích như Predict difference analysis, hoặc LIME, đây đều là những kỹ thuật vượt trội để áp dụng cho bất kì mô hình để đưa ra lời giải thích. Tuy nhiên, những cách tiếp cận trên sẽ đòi hỏi phải đánh giá nhiều lần để kiểm tra tác động của các input đầu vào (do đầu vào đã được xáo trộn perturbation), dẫn đến việc chậm chạp khi dữ liệu có nhiều chiều. Ngoài ra, việc perturbation cục bộ có thể mô tả không trung thực về tổng thể đóng góp của một đặc trưng trong việc ảnh hưởng đến sự quyết định gom cụm của mô hình.
 
 **Ý tưởng:** Chuyển những mô hình học máy không giám sát thông thường thành mạng nơ-ron và sau đó tìm lời giải thích cho chúng 
@@ -543,9 +558,9 @@ R_{k}=\frac{exp(-\beta h_{k})}{\Sigma_{k\neq c}exp(-\beta h_{k})}f_{c}
 $$
 
 Trong đó: 
-- $R_{k}$ là mức độ phù hợp của nơ-ron $h_{k}$ với cluster assignment $f_{c}$
+- $R_{k}$ (điểm số trung gian): là mức độ phù hợp của nơ-ron $h_{k}$ với cluster assignment $f_{c}$
 
-- $\beta$ là một siêu tham số độ cứng. Tham số độ cứng nội suy giữa một chiến lược phân phối đều ($\beta=0$) và chiến lược tận dụng tối thiểu ($\beta \rightarrow \infty$). 
+- $\beta$: là một siêu tham số độ cứng. Tham số độ cứng nội suy giữa một chiến lược phân phối đều ($\beta=0$) và chiến lược tận dụng tối thiểu ($\beta \rightarrow \infty$). 
 
 Lưu ý rằng đối với hai trường hợp của siêu tham số $\beta$, cách tiếp cận ở đây cho phép ngữ cảnh hóa lời giải thích (nghĩa là không phân phối lại trên các cụm đối thủ khác nhau quá xa và không liên quan), đồng thời đảm bảo tính liên tục của lời giải thích khi chúng ta chuyển từ một cụm đối thủ này sang một cụm đối thủ khác. Có thể dụng heuristic để chọn siêu tham số $\beta$:
 
@@ -561,7 +576,7 @@ $$
 R_{k}=\Sigma_{k\neq c} \frac{(x_{i}-m_{ik})w_{ik}}{\Sigma_{i}(x_{i}-m_{ik})w_{ik}}R_{k}
 $$
 
-Trong đó, $m_{k}=(\mu_{c}+\mu_{k})/2$ là trung điểm giữa tọng tâm của cụm lợi ích và cụm đối thủ cạnh tranh. Nói cách khác, chính là gán các kích thước nơi các điểm đầu vào kích hoạt so với trung điểm ($x-m_{k}$) phù hợp với phản hồi của mô hình $w_{k}$.
+Trong đó, $m_{k}=(\mu_{c}+\mu_{k})/2$ là trung điểm giữa trọng tâm của cụm lợi ích và cụm đối thủ cạnh tranh. Nói cách khác, chính là gán các kích thước nơi các điểm đầu vào kích hoạt so với trung điểm ($x-m_{k}$) phù hợp với phản hồi của mô hình $w_{k}$.
 
 **2. Kernel K-Means**
 
@@ -583,7 +598,7 @@ Trong đó,
 
 - $(u_{i})_{i}$ và $(u_{j})_{j}$ là một tập hợp các điểm dữ liệu đại diện cho hai cụm 
 
-- $C_{c},C_{k} \subset \mathbb{N}$ là các tập chỉ số không trùng lặp của các vectow support đại diện cho các cụm này và khi đó $LME^{-\gamma}$ có giá trị tổng quát F-mean với $F(t)=e^{-\gamma t}$
+- $C_{c},C_{k} \subset \mathbb{N}$ là các tập chỉ số không trùng lặp của các vector support đại diện cho các cụm này và khi đó $LME^{-\gamma}$ có giá trị tổng quát F-mean với $F(t)=e^{-\gamma t}$
 
 $$
 LME_{i \in C}^{-\gamma} {s_{i}} = -\frac{1}{\gamma} \Bigl(\frac{1}{|C|}\Sigma_{i \in C}exp(-\gamma s_{i})\Bigr)
@@ -597,10 +612,17 @@ Hàm quyết định  theo công thức (2) có thể được tái biểu diễ
 *Neuralized kernel K-means:*
 
 $$
-h_{ijk}=w^{T}_{ij}x+b_{ij} \qquad \textrm{(layer 1)} $$
-$$h_{jk}=LME^{\gamma}_{i\in C_{c}}\{h_{ijk}\} \qquad \textrm{(layer 2)} $$
-$$h_{k}=LME^{-\gamma}_{j\in C_{k}}\{h_{jk}\} \qquad \textrm{(layer 3)} $$
-$$f_{c}=min_{k\neq c}\{h_{k}\} \qquad \textrm{(layer 4)} $$
+h_{ijk}=w^{T}_{ij}x+b_{ij} \qquad \textrm{(layer 1)}
+$$
+$$
+h_{jk}=LME^{\gamma}_{i\in C_{c}}\{h_{ijk}\} \qquad \textrm{(layer 2)}
+$$
+$$
+h_{k}=LME^{-\gamma}_{j\in C_{k}}\{h_{jk}\} \qquad \textrm{(layer 3)}
+$$
+$$
+f_{c}=min_{k\neq c}\{h_{k}\} \qquad \textrm{(layer 4)}
+$$
 
 Khi $w_{ij}=2(u_{i}-u_{j})$ và $b_{ij}=\|u_{j}\|^{2}-\|u_{i}\|^{2}$ thì $LME^{\gamma}$ và $LME^{-\gamma}$ có thể được xem như là soft max-pooling và soft min-pooling, và được gán cho cụm $c$ nếu $f_{c}(x)>0$.
 
@@ -619,24 +641,29 @@ $$
 *Neuralized Deep K-means:*
 
 $$
-a = \Psi_{L}\circ...\circ\Psi_{1}(x)\qquad \textrm{(layer 1...L)} $$
-$$h_{k}=w^{T}_{k}a+b_{k} \qquad \textrm{(layer L+1)} $$
-$$f_{c}=min_{k\neq c}\{h_{k}\} \qquad \textrm{(layer L+2)}$$
+a = \Psi_{L}\circ...\circ\Psi_{1}(x)\qquad \textrm{(layer 1...L)}
+$$
+$$
+h_{k}=w^{T}_{k}a+b_{k} \qquad \textrm{(layer L+1)}
+$$
+$$
+f_{c}=min_{k\neq c}\{h_{k}\} \qquad \textrm{(layer L+2)}
+$$
 
 Trong đó, $w_{k}=2(\mu_{c}-\mu_{k})\;\text{và}\;b_{k}=\|\mu_{k}\|^{2}-\|\mu_{c}\|^{2}$ 
 
 
-## Part 7: XAI-Based Pruning and Quantization
-Ngày nay, sự phát triển của mạng nơ-ron nhân tạo (DNN) đã tạo được nhiều thành công trong các lĩnh vực khác nhau. Tuy nhiên, đi đôi với việc mạng học sâu ngày càng trở nên phức tạp là sự gia tăng các tham số cũng như là các phép tính toán cần thực hiện. Sự gia tăng về bộ nhớ và nhu cầu tính toán khiến việc học sâu trở nên khó khăn đối với các thiết bị có nên tảng phần cứng hạn chế (như là điện thoại di dộng, các thiết bị ngoại vi, IoT,...). Do đó nhu cầu giảm thiểu chi phí chung đồng thời duy trì hiệu suất của mô hình rất được quan tâm (bao gồm kỹ thuật rút gọn tham số, quantization, pruning, kỹ thuật nén không mất mát dữ liệu,...).
+## Phần 7: Kỹ thuật Pruning và Quantization dựa vào XAI (XAI-Based Pruning and Quantization)
+Ngày nay, sự phát triển của mạng nơ-ron nhân tạo (DNN) đã tạo được nhiều thành công trong các lĩnh vực khác nhau. Tuy nhiên, đi đôi với việc mạng học sâu ngày càng trở nên phức tạp là sự gia tăng các tham số cũng như là các phép tính toán cần thực hiện. Sự gia tăng về bộ nhớ và nhu cầu tính toán khiến việc học sâu trở nên khó khăn đối với các thiết bị có nên tảng phần cứng hạn chế (như là điện thoại di động, các thiết bị ngoại vi, IoT,...). Do đó nhu cầu giảm thiểu chi phí chung đồng thời duy trì hiệu suất của mô hình rất được quan tâm (bao gồm kỹ thuật rút gọn tham số, quantization, pruning, kỹ thuật nén không mất mát dữ liệu,...).
 
 ### XAI-Based Pruning [^fn9]
-Để có thể giảm bộ nhớ lữu trữ cũng như chi phí tính toán đối với các mạng DNN, kỹ thuật cắt tỉa mạng nơ-ron được đánh giá rất cao.
+Để có thể giảm bộ nhớ lưu trữ cũng như chi phí tính toán đối với các mạng DNN, kỹ thuật cắt tỉa mạng nơ-ron được đánh giá rất cao.
 
-**Idea**: Cắt tỉa (loại bỏ) để loại bỏ các tập con của các đơn vị mang nơ-ron (trọng số hoặc filter) ít quan trọng. xác định tập con không liên quan (không có ảnh hưởng cao trong mạng) của các tham số dùng để xóa.
+**Ý tưởng phương pháp pruning**: Cắt tỉa (loại bỏ) để loại bỏ các tập con của các đơn vị mạng nơ-ron (trọng số hoặc filter) ít quan trọng. Xác định tập con không liên quan (không có ảnh hưởng cao trong mạng) của các tham số để thực hiện xóa chúng.
 
 **XAI với Pruning**
 
-Kỹ thuật cắt tỉa này kết hợp với việc sử dụng XAI (cụ thể là LRP). LRP được phát triển như một phương pháp để giải thích việc gán các điểm quan trọng. Với các kích thước đầu vào khác nhau của mạng nơ-ron phản ánh sự đóng góp của kích thước đầu vào đấy đến quyết định của mô hình. Mức độ liên quan (relavance) được lan truyền ngược từ đầu ra (output) đến đầu vào (input) và được gán cho từng đơn vị trong mạng. Bởi vì điểm số liên quan (relavance scores) được tính cho mọi lớp từ đầu ra đến đầu vào nên những điểm số này về cơ bản sẽ phản ánh tầm quan trọng của từng đơn vị riêng lẻ trong một mô hình và sự đóng góp của nó bên trong mạng. Do đó đây có thể được xem là một phương pháp tiềm năng được dùng làm tiêu chí để cắt tỉa.
+Kỹ thuật cắt tỉa này kết hợp với việc sử dụng XAI (cụ thể là LRP). LRP được phát triển như một phương pháp để giải thích việc gán các điểm quan trọng. Với các kích thước đầu vào khác nhau của mạng nơ-ron phản ánh sự đóng góp của kích thước đầu vào đấy đến quyết định của mô hình. Mức độ liên quan (relevance) được lan truyền ngược từ đầu ra (output) đến đầu vào (input) và được gán cho từng đơn vị trong mạng. Bởi vì điểm số liên quan (relevance scores) được tính cho mọi lớp từ đầu ra đến đầu vào nên những điểm số này về cơ bản sẽ phản ánh tầm quan trọng của từng đơn vị riêng lẻ trong một mô hình và sự đóng góp của nó bên trong mạng. Do đó đây có thể được xem là một phương pháp tiềm năng được dùng làm tiêu chí để cắt tỉa.
 
 **LRP-Based Network Pruning**
 
@@ -651,21 +678,21 @@ Tính toán kích thước đầu vào của mạng CNN và thể hiện chúng 
 Đặc điểm chính của LRP là lan truyền ngược qua mạng mà trong đó đầu ra của mạng được phân phối lại cho tất cả các đơn vị của mạng theo kiểu từng lớp. Lan truyền ngược như thế này có cấu trúc tương tự như lan truyền ngược gradient (gradient backpropagation) nên thời gian chạy là tương tự như nhau. Sự phân phối lại này sẽ dựa trên nguyên tắc bảo tồn sao cho các mối liên quan có thể ngay lập tức được hiểu là sự đóng góp mà một đơn vị trong mạng đóng góp vào đầu ra của mạng. 
 
 ### Explainability-Driven Quantization [^fn10]
-Đối với việc các phép tính toán trong các mạng học sâu, hầu hết tham số được tính toán trong các phần cứng như CPU, GPU đều có dạng số chấm động 32 bit. Điều nnày dẫn đến chi phi tính toán cao, tiêu thụ nhiều điện năng, độ trễ lớn và nhu cầu bộ nhớ cấp phát rất cao. Bắt nguồn từ vấn đề đó, người ta đã đề xuất ra phương pháp quantization.
+Đối với việc các phép tính toán trong các mạng học sâu, hầu hết tham số được tính toán trong các phần cứng như CPU, GPU đều có dạng số chấm động 32 bit. Điều này dẫn đến chi phí tính toán cao, tiêu thụ nhiều điện năng, độ trễ lớn và nhu cầu bộ nhớ cấp phát rất cao. Bắt nguồn từ vấn đề đó, người ta đã đề xuất ra phương pháp quantization.
 
-**Idea:** Kỹ thuật quantization được áp dụng để giảm thiểu số bit cần dùng để biểu diễn các tham số, trọng số bằng cách ánh xạ các giá trị tương ứng thành một tập hữu hạn gồm các mức quantization rời rạc (các cụm). Nếu có n cụm, ta chỉ cần $log_{2}n$ bit để biểu diễn một điểm dữ liệu, nghĩa là càng N càng nhỏ (càng ít cụm) thì càng cần ít bit để biểu diễn cho điểm dữ liệu đó. Tuy nhiên, việc liên tục giảm số cụm (giảm n) có thể dẫn đến việc gây ra lỗi và hiệu suất của mô hình ngày càng giảm.
+**Ý tưởng phương pháp quantization:** Kỹ thuật quantization được áp dụng để giảm thiểu số bit cần dùng để biểu diễn các tham số, trọng số bằng cách ánh xạ các giá trị tương ứng thành một tập hữu hạn gồm các mức quantization rời rạc (các cụm). Nếu có n cụm, ta chỉ cần $log_{2}n$ bit để biểu diễn một điểm dữ liệu, nghĩa là càng N càng nhỏ (càng ít cụm) thì càng cần ít bit để biểu diễn cho điểm dữ liệu đó. Tuy nhiên, việc liên tục giảm số cụm (giảm n) có thể dẫn đến việc gây ra lỗi và hiệu suất của mô hình ngày càng giảm.
 
 **XAI với Quantization**
 
-Các mô hình XAI có thể được áp dụng để tìm các đặc trưng liên quan ở đầu vào. Bằng cách sử dụng thông tin về mức độ phù hợp của trọng số từ LPR (được nhắc đến ở phần đầu). Do đó, phương pháp này sẽ kết hợp hai khái niệm XAI và lý thuyết thông tin, nghĩa là thay vì chỉ gán các giá trị trọng số dựa trên khoảng cách của chúng tới các cụm quantization tương ứng, giờ đây mô hình sẽ xét thêm mức độ liên quan của trọng số dựa trên LRP rồi mới quyết định gán một giá trị trọng số vào cụm quantization nào.
+Các mô hình XAI có thể được áp dụng để tìm các đặc trưng liên quan ở đầu vào. Bằng cách sử dụng thông tin về mức độ phù hợp của trọng số từ LRP (được nhắc đến ở phần đầu). Do đó, phương pháp này sẽ kết hợp hai khái niệm XAI và lý thuyết thông tin, nghĩa là thay vì chỉ gán các giá trị trọng số dựa trên khoảng cách của chúng tới các cụm quantization tương ứng, giờ đây mô hình sẽ xét thêm mức độ liên quan của trọng số dựa trên LRP rồi mới quyết định gán một giá trị trọng số vào cụm quantization nào.
 
 
-## Conclusion: Future of XAI [^fn11]
+## Phần 8: Kết luận - Tương lai của XAI (Conclusion - Future of XAI) [^fn11]
 Trong những năm gần đây, các ứng dụng của trí tuệ nhân tạo AI đã được sử dụng trong rất nhiều lĩnh vực như khoa học, tài chính, kinh doanh, mạng xã hội, và đạt được nhiều thành công rực rỡ. Các thuật toán dựa trên AI đã được áp dụng thành công cho tất cả các loại hình dữ liệu (như văn bản, hình ảnh, âm thanh, video) trong các lĩnh vực khác nhau, chẳng hạn như chăm sóc sức khỏe, quốc phòng, luật pháp và trật tự, quản trị, công nghiệp tự trị,... Thuật toán AI giờ đây có thể hiệu quả giải quyết một số phân loại, hồi quy, phân cụm, học chuyển giao hoặc vấn đề tối ưu hóa.
 
 Trong đó, việc tìm các lời giải thích cho các mô hình đóng một vai trò rất quan trọng để đảm bảo được sự tin cậy cũng như tính minh bạch của các mô hình. Một ví dụ trong lĩnh vực y tế, khi bác sĩ muốn chắc chắn về kết quả dự đoán bệnh của một mô hình AI, họ phải kiểm tra lại bằng cách phân tích ảnh chụp CT (một phương pháp đòi hỏi tốn nhiều chi phí và thời gian) bởi vì mô hình AI thường không chính xác 100%. Do đó, nếu có một cái nhìn chi tiết về cách đưa ra kết quả của mô hình AI, sẽ giúp cho bác sĩ có thể đánh giá được độ tin cậy của kết quả dự đoán, đồng thời giúp tránh được nguy hiểm đến tính mạng của bệnh nhân nếu xảy ra lỗi.
 
-Các mô hình XAI sẽ có thể tra lời được các câu hỏi "Wh" (what, why, when - cái gì, tại sao, khi nào) mà các mô hình truyền thống khó có thể trả lời được. Từ đó, các mô hình XAI có thể được ứng dụng trong các lĩnh vực như chăm sóc sức khỏe, quốc phòng, luật,...- đều là những lĩnh vực đòi hỏi sự tin cậy, minh bạch và con người có thể lý giải được. 
+Các mô hình XAI sẽ có thể trả lời được các câu hỏi "Wh" (what, why, when - cái gì, tại sao, khi nào) mà các mô hình truyền thống khó có thể trả lời được. Từ đó, các mô hình XAI có thể được ứng dụng trong các lĩnh vực như chăm sóc sức khỏe, quốc phòng, luật,...- đều là những lĩnh vực đòi hỏi sự tin cậy, minh bạch và con người có thể lý giải được. 
 
 **XAI AS A TOOL TO OPEN BLACK BOX**
 
@@ -673,21 +700,21 @@ Các mô hình XAI sẽ có thể tra lời được các câu hỏi "Wh" (what,
 
 *Bốn yếu tố chính của XAI. Nguồn: Prashant Gohel et al.[^fn11]*
 
-**Objectives**
+**Mục tiêu của XAI**
 
-**a. Transparency and Informativeness**
+**a. Tính minh bạch và thông tin**
 
 Các mô hình XAI có thể nâng cao sự công bằng cũng như tính minh bạch bằng cách đưa ra lời giải thích mà người bình thường cũng có thể hiểu được. Tính minh bạch là yếu tố quan trọng để đánh giá hiệu quả hoạt động của một mô hình XAI và những lý giải của nó.
 
-**b. Trust and confidence**
+**b. Tính tin cậy**
 
-Sự tin cậy là một trong những yếu tố quan trọng khiên con người quyết định sử dụng, phụ thuộc vào một công nghệ nào đó. Con người sẽ càng tin cậy các thuật toán AI/ML nếu chúng đưa ra được những lời giải thích xác thực, hợp lý và khoa học.
+Sự tin cậy là một trong những yếu tố quan trọng khiến con người quyết định sử dụng, phụ thuộc vào một công nghệ nào đó. Con người sẽ càng tin cậy các thuật toán AI/ML nếu chúng đưa ra được những lời giải thích xác thực, hợp lý và khoa học.
 
-**c. Bias Understanding and Fairness**
+**c. Tính công bằng**
 
 Bias-variance trade off trong các mô hình AL/ML giúp XAI gia tăng sự công bằng và giúp giảm thiểu bias (bias-variance trade off) của dự đoán tại thời điểm giải thích, diễn giải.
 
-**Scope**
+**Tầm vực của XAI**
 
 ![](https://i.imgur.com/iPcR67z.png)
 
@@ -695,13 +722,13 @@ Bias-variance trade off trong các mô hình AL/ML giúp XAI gia tăng sự côn
 
 XAI có thể được ứng dụng trong nhiều lĩnh vực khác nhau, nhưng hầu hết đều là những lĩnh vực đòi hỏi sự tin cậy, minh bạch và con người có thể hiểu được:
 
-**a. Xử lý ngôn ngữ tự nhiên (NLP)**: Các mô hình XAI có thể đem đến sự tin cậy trong các bài toán phân loại từ ngữ, văn bản, phát hiện tin giả mạo, phát hiện lừa đảo. Góp phần tăng tính tự động hóa trong thời đại công nghiệp 4.0
+**a. Xử lý ngôn ngữ tự nhiên (NLP)**: Các mô hình XAI có thể đem đến sự tin cậy trong các bài toán phân loại từ ngữ, văn bản, phát hiện tin giả mạo, phát hiện lừa đảo. Góp phần tăng tính tự động hóa trong thời đại công nghiệp 4.0.
 
 **b. Y tế (Medical)**: XAI có thể phân tích tình trạng, bệnh tình của bệnh nhân bằng cách quan sát lịch sử bệnh tật của họ. Bằng cách sử dụng các thuật toán AI/ML trong  xử lý hình ảnh y học, các chuyên gia y tế có thể dễ dàng phát hiện các bệnh nguy hiểm ở giai đoạn sớm nhất (khối u ác tính, bệnh về phổi, bệnh da liễu, xương tủy,...).
 
 **c. Quốc phòng (Defence)**: Ngày nay trong chiến tranh, vũ khí tự động hóa và tên lửa dẫn đường tự động, máy bay không người lái ngày càng thể hiện uy lực mạnh mẽ, do đó việc phát triển XAI trong lĩnh vực quốc phòng giúp các thiết bị, vũ khí chiến đấu có tính hiệu quả cao hơn, chính xác hơn và ổn định hơn.
 
-**d. Ngân hàng**: Các hệ thống ngân hàng là một trong những cơ sở quan trọng nhất của một quốc gia nói riêng và toàn thế giới nói chung. Trong thời đại số hóa hiện nay, nhiều kẻ xấu đã lợi dụng lỗ hổng để lừa đảo, gian lận các giao dịch nhằm trục lời cho bản thân. Việc phát triển một mô hình XAI tốt có thể giúp để phân tích, điều tra được những giao dịch gian lận và giảm các thông tin sai lệch nhằm lừa đảo khách hàng.
+**d. Ngân hàng (Banking)**: Các hệ thống ngân hàng là một trong những cơ sở quan trọng nhất của một quốc gia nói riêng và toàn thế giới nói chung. Trong thời đại số hóa hiện nay, nhiều kẻ xấu đã lợi dụng lỗ hổng để lừa đảo, gian lận các giao dịch nhằm trục lợi cho bản thân. Việc phát triển một mô hình XAI tốt có thể giúp để phân tích, điều tra được những giao dịch gian lận và giảm các thông tin sai lệch nhằm lừa đảo khách hàng.
 
 Nói tóm lại, XAI là một lĩnh vực quan trọng và tiềm năng về lợi ích trong cả nghiên cứu lẫn thực tế. XAI sẽ ngày càng chứng minh được khả năng vượt trội các mô hình ML/AI truyền thống vốn không thể giải thích được kết quả.
 
